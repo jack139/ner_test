@@ -17,13 +17,13 @@ JSON_END_POS_KEY = "end_pos"
 JSON_LABEL_KEY = "label_type"
 JSON_OVERLAP_KEY = "overlap"
 
-ORI_DATA_DIR = "../data/original_data/"
+ORI_DATA_DIR = "../data/test/original_data/"
 TAGGED_DATA_DIR = "tagged_data/"
 ORI_TAGGED_DATA_FILEPATH = os.path.join(ORI_DATA_DIR, TAGGED_DATA_DIR)
 UNTAGGED_DATA_DIR = "untagged_data/"
 ORI_UNTAGGED_DATA_FILEPATH = os.path.join(ORI_DATA_DIR, UNTAGGED_DATA_DIR)
 
-PROC_DATA_DIR = "../data/processed_data/"
+PROC_DATA_DIR = "../data/test/processed_data/"
 TRAIN_DATA_FILENAME = "train_data.txt"
 TRAIN_DATA_FILEPATH = os.path.join(PROC_DATA_DIR, TRAIN_DATA_FILENAME)
 TEST_DATA_FILENAME = "test_data.txt"
