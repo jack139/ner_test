@@ -18,3 +18,4 @@ eggs/
 lib/
 lib64/
 ckpt/
+test/
