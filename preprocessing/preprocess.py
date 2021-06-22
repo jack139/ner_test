@@ -81,39 +81,54 @@ def __preprocess_tagged_data(samples_list, tagged_data_filepath, delimiter="\n")
 
         # 写入文件
         length = 0 
-        tmp = ''
+        tmp_char = []
+        tmp_bio = []
+        tmp_attr = []
 
         for i in word2tag:
-            if length>0:
-                f_in_char.write(' ')
-                f_out_bio.write(' ')
-                f_out_attr.write(' ')
+            #if length>0:
+            #    f_in_char.write(' ')
+            #    f_out_bio.write(' ')
+            #    f_out_attr.write(' ')
 
-            f_in_char.write(i[0])
-            f_out_bio.write(i[1])
-            f_out_attr.write(i[2])
+            #f_in_char.write(i[0])
+            #f_out_bio.write(i[1])
+            #f_out_attr.write(i[2])
+
+            tmp_char.append(i[0])
+            tmp_bio.append(i[1])
+            tmp_attr.append(i[2])
 
             length += 1
-            tmp += i[0]
 
             # 接近100个字就要换行
             if  (length>50) and (i[0] in ['；', '，', '。', ',', '）', '、']): 
-                f_in_char.write(delimiter)
-                f_out_bio.write(delimiter)
-                f_out_attr.write(delimiter)
-                max_len = max(max_len, length)
+                if len(''.join(tmp_bio).replace('O',''))>0: # 只有O的行不保存
+                    f_in_char.write(' '.join(tmp_char))
+                    f_in_char.write(delimiter)
+                    f_out_bio.write(' '.join(tmp_bio))
+                    f_out_bio.write(delimiter)
+                    f_out_attr.write(' '.join(tmp_attr))
+                    f_out_attr.write(delimiter)
+                    max_len = max(max_len, length)
 
-                if length>200:
-                    print(tmp)
+                    if length>200:
+                        print(''.join(tmp_char))
 
                 length = 0
-                tmp = ''
+                tmp_char = []
+                tmp_bio = []
+                tmp_attr = []
 
         # 一条结束后，如果还有剩余字符，都进行换行
         if length>0:
-            f_in_char.write(delimiter)
-            f_out_bio.write(delimiter)
-            f_out_attr.write(delimiter)
+            if len(''.join(tmp_bio).replace('O',''))>0: # 只有O的行不保存
+                f_in_char.write(' '.join(tmp_char))
+                f_in_char.write(delimiter)
+                f_out_bio.write(' '.join(tmp_bio))
+                f_out_bio.write(delimiter)
+                f_out_attr.write(' '.join(tmp_attr))
+                f_out_attr.write(delimiter)
 
         #for i in range(len(word2tag)):
         #    print('%s\t%s\t%s'%(word2tag[i][0],word2tag[i][1],word2tag[i][2]))
