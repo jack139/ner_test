@@ -5,8 +5,6 @@ import ast
 import argparse
 import json
 import os
-
-import jieba.posseg as pseg
 import numpy as np
 
 # The JSON keys used in the original data files
@@ -18,19 +16,9 @@ JSON_LABEL_KEY = "label_type"
 JSON_OVERLAP_KEY = "overlap"
 
 ORI_DATA_DIR = "../data/test/original_data/"
-TAGGED_DATA_DIR = "tagged_data/"
-ORI_TAGGED_DATA_FILEPATH = os.path.join(ORI_DATA_DIR, TAGGED_DATA_DIR)
-UNTAGGED_DATA_DIR = "untagged_data/"
-ORI_UNTAGGED_DATA_FILEPATH = os.path.join(ORI_DATA_DIR, UNTAGGED_DATA_DIR)
-
 PROC_DATA_DIR = "../data/test/processed_data/"
-TRAIN_DATA_FILENAME = "train_data.txt"
-TRAIN_DATA_FILEPATH = os.path.join(PROC_DATA_DIR, TRAIN_DATA_FILENAME)
-TEST_DATA_FILENAME = "test_data.txt"
-TEST_DATA_FILEPATH = os.path.join(PROC_DATA_DIR, TEST_DATA_FILENAME)
-UNTAGGED_TEST_DATA_FILENAME = "untagged_test_data.txt"
-UNTAGGED_TEST_DATA_FILEPATH = os.path.join(PROC_DATA_DIR, UNTAGGED_TEST_DATA_FILENAME)
 
+vocab_attr = set(['null'])
 
 def preprocess_tagged_data(ori_data_dir, train_data_filepath, test_data_filepath="", test_split=0):
     train_total_num = 0
@@ -54,81 +42,95 @@ def preprocess_tagged_data(ori_data_dir, train_data_filepath, test_data_filepath
     print("Training samples: {}, Testing samples: {}".format(train_total_num, test_total_num))
 
 
-def preprocess_untagged_data(ori_data_dir, test_data_filepath):
-    train_total_num = 0
-    for data_filename in os.listdir(ori_data_dir):
-        data_filepath = os.path.join(ori_data_dir, data_filename)
-        samples_list = np.loadtxt(data_filepath,
-                                  dtype="str", comments=None, delimiter="\r\n", encoding="utf-8-sig")
-        train_total_num += len(samples_list)
-        __preprocess_untagged_data(samples_list, test_data_filepath)
-
-    print("Training samples: {}".format(train_total_num))
-
 
 def __preprocess_tagged_data(samples_list, tagged_data_filepath, delimiter="\n"):
-    with open(tagged_data_filepath, "a", encoding="utf-8-sig") as fw:
-        for i in range(len(samples_list)):
-            word2tag = []
-            sample = json.loads(samples_list[i])
+    f_in_char = open(os.path.join(tagged_data_filepath, 'input.seq.char'), "a", encoding="utf-8")
+    f_out_attr = open(os.path.join(tagged_data_filepath, 'output.seq.attr'), "a", encoding="utf-8")
+    f_out_bio = open(os.path.join(tagged_data_filepath, 'output.seq.bio'), "a", encoding="utf-8")
 
-            original_text = sample[JSON_ORI_TXT_KEY]
-            for sentence in original_text.split(chr(12290)):
-                if len(sentence) < 1:
-                    continue
-                sentence = sentence + chr(12290)
-                for words in pseg.cut(sentence):
-                    for w in words.word:
-                        word2tag.append([w, "O"])
+    max_len = 0
 
-            entities = sample[JSON_ENTITIES_KEY]
-            for entity in entities:
-                if len(entity) < 1:
-                    continue
-                start_pos = entity[JSON_START_POS_KEY]
-                end_pos = entity[JSON_END_POS_KEY]
-                label_type = entity[JSON_LABEL_KEY]
-                word2tag[start_pos][1] = "B-" + label_type
-                for j in range(start_pos + 1, end_pos):
-                    word2tag[j][1] = "I-" + label_type
+    for i in range(len(samples_list)):
+        word2tag = []
+        sample = json.loads(samples_list[i])
 
-            for [word, tag] in word2tag:
-                fw.write(word + " " + tag)
-                fw.write(delimiter)
+        original_text = sample[JSON_ORI_TXT_KEY]
 
-            fw.write(delimiter)
+        for w in original_text:
+            word2tag.append([w, 'O', 'null'])
 
+        entities = sample[JSON_ENTITIES_KEY]
+        for entity in entities:
+            if len(entity) < 1:
+                continue
+            start_pos = entity[JSON_START_POS_KEY]
+            end_pos = entity[JSON_END_POS_KEY]
+            label_type = entity[JSON_LABEL_KEY]
+            vocab_attr.add(label_type)
+            if end_pos-start_pos==1:
+                word2tag[start_pos][1] = "S"
+                word2tag[start_pos][2] = label_type
+            else:
+                word2tag[start_pos][1] = "B"
+                word2tag[start_pos][2] = label_type
+                for j in range(start_pos + 1, end_pos - 1):
+                    word2tag[j][1] = "I"
+                    word2tag[j][2] = label_type
+                word2tag[end_pos-1][1] = "E"
+                word2tag[end_pos-1][2] = label_type
 
-def __preprocess_untagged_data(samples_list, untagged_data_filepath, delimiter="\n"):
-    with open(untagged_data_filepath, "a", encoding="utf-8-sig") as fw:
-        for i in range(len(samples_list)):
-            sample = json.loads(samples_list[i])
-            original_text = sample[JSON_ORI_TXT_KEY]
-            for sentence in original_text.split(chr(12290)):
-                if len(sentence) < 1:
-                    continue
-                sentence = sentence + chr(12290)
-                for words in pseg.cut(sentence):
-                    for w in words.word:
-                        fw.write(w)
-                        fw.write(delimiter)
+        # 写入文件
+        length = 0 
+        tmp = ''
 
-            fw.write(delimiter)
+        for i in word2tag:
+            if length>0:
+                f_in_char.write(' ')
+                f_out_bio.write(' ')
+                f_out_attr.write(' ')
+
+            f_in_char.write(i[0])
+            f_out_bio.write(i[1])
+            f_out_attr.write(i[2])
+
+            length += 1
+            tmp += i[0]
+
+            # 接近100个字就要换行
+            if  (length>50) and (i[0] in ['；', '，', '。', ',', '）', '、']): 
+                f_in_char.write(delimiter)
+                f_out_bio.write(delimiter)
+                f_out_attr.write(delimiter)
+                max_len = max(max_len, length)
+
+                if length>200:
+                    print(tmp)
+
+                length = 0
+                tmp = ''
+
+        # 一条结束后，如果还有剩余字符，都进行换行
+        if length>0:
+            f_in_char.write(delimiter)
+            f_out_bio.write(delimiter)
+            f_out_attr.write(delimiter)
+
+        #for i in range(len(word2tag)):
+        #    print('%s\t%s\t%s'%(word2tag[i][0],word2tag[i][1],word2tag[i][2]))
+
+    f_in_char.close() 
+    f_out_attr.close()
+    f_out_bio.close()
+
+    print("max length= ", max_len)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--tagged', type=ast.literal_eval, default='True',
-                        help='Whether the data has been tagged')
-    parser.add_argument('--test_split', type=float, default=0.1,
-                        help='Fraction of tagged data used as testing data')
-    args = parser.parse_args()
+    preprocess_tagged_data(ori_data_dir=ORI_DATA_DIR+'train', train_data_filepath=PROC_DATA_DIR+'train')
+    preprocess_tagged_data(ori_data_dir=ORI_DATA_DIR+'test', train_data_filepath=PROC_DATA_DIR+'test')
 
-    if args.tagged:
-        preprocess_tagged_data(ori_data_dir=ORI_TAGGED_DATA_FILEPATH,
-                               train_data_filepath=TRAIN_DATA_FILEPATH,
-                               test_data_filepath=TEST_DATA_FILEPATH,
-                               test_split=args.test_split)
-    else:
-        preprocess_untagged_data(ori_data_dir=ORI_UNTAGGED_DATA_FILEPATH,
-                                 test_data_filepath=UNTAGGED_TEST_DATA_FILEPATH)
+    # 保存属性值
+    with open(os.path.join(PROC_DATA_DIR, 'vocab_attr.txt'), "a", encoding="utf-8") as f:
+        for i in vocab_attr:
+            f.write(i)
+            f.write("\n")
