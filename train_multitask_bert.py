@@ -97,7 +97,7 @@ with tf.Session(config=tf_config) as sess:
     losses = []
     batches = 0
     best_f1 = 0
-    batch_size = 40
+    batch_size = 24
 
     while epoches < 30:
         (inputs_seq_batch, 
