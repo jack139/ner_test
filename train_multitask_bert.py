@@ -15,7 +15,7 @@ data_path = "./data/data2"
 bert_vocab_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/vocab.txt"
 bert_config_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/bert_config.json"
 bert_ckpt_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/bert_model.ckpt"
-#bert_ckpt_path = "ckpt/model.ckpt.batch6000_0.6236"
+#bert_ckpt_path = "ckpt/model.ckpt.batch4700_0.7603"
 
 # set logging
 log_file_path = "./ckpt/run.log"
