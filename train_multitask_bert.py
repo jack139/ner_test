@@ -49,9 +49,9 @@ data_processor_train = DataProcessor(
 )
 
 data_processor_valid = DataProcessor(
-    data_path+"/test/input.seq.char",
-    data_path+"/test/output.seq.bio",
-    data_path+"/test/output.seq.attr",
+    data_path+"/val/input.seq.char",
+    data_path+"/val/output.seq.bio",
+    data_path+"/val/output.seq.attr",
     w2i_char,
     w2i_bio, 
     w2i_attr, 
