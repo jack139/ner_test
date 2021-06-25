@@ -10,11 +10,11 @@ from utils import load_vocabulary
 from utils import extract_kvpairs_in_bioes
 from utils import cal_f1_score
 
-data_path = "./data/data1"
+data_path = "./data/data2"
 
 bert_vocab_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/vocab.txt"
 bert_config_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/bert_config.json"
-bert_ckpt_path = "ckpt/model.ckpt.batch7900_0.7629"
+bert_ckpt_path = "ckpt/model.ckpt.batch1500_0.8141"
 
 # set logging
 logger = logging.getLogger()
