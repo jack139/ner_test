@@ -31,12 +31,17 @@ class DataProcessor_MTL_BERT(object):
                  w2i_attr,
                  shuffling=False):
         
-        with open(input_seq_path, "r", encoding="utf-8") as f:
-            lines1 = f.read().strip().split("\n")
-        with open(output_seq_bio_path, "r", encoding="utf-8") as f:
-            lines2 = f.read().strip().split("\n")
-        with open(output_seq_attr_path, "r", encoding="utf-8") as f:
-            lines3 = f.read().strip().split("\n")
+        if type(input_seq_path)==type(""): # 传入文件名
+            with open(input_seq_path, "r", encoding="utf-8") as f:
+                lines1 = f.read().strip().split("\n")
+            with open(output_seq_bio_path, "r", encoding="utf-8") as f:
+                lines2 = f.read().strip().split("\n")
+            with open(output_seq_attr_path, "r", encoding="utf-8") as f:
+                lines3 = f.read().strip().split("\n")
+        else: # 传入的是 列表
+            lines1 = input_seq_path
+            lines2 = output_seq_bio_path
+            lines3 = output_seq_attr_path
         
         inputs_seq = []
         outputs_seq_bio = []

@@ -10,11 +10,11 @@ from utils import load_vocabulary
 from utils import extract_kvpairs_in_bioes
 from utils import cal_f1_score
 
-data_path = "./data/data2"
+data_path = "./data/data1"
 
 bert_vocab_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/vocab.txt"
 bert_config_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/bert_config.json"
-bert_ckpt_path = "ckpt/model.ckpt.batch1500_0.8141"
+bert_ckpt_path = "ckpt/model.ckpt.batch7900_0.7629"
 
 # set logging
 logger = logging.getLogger()
@@ -32,11 +32,14 @@ w2i_attr, i2w_attr = load_vocabulary(data_path+"/vocab_attr.txt")
 
 logger.info("loading data...")
 
+input_char_list = [', 2 0 0 9 年 1 2 月 底 出 现 黑 便 , , 于 当 地 行 胃 镜 检 查 并 行 病 理 检 查 示 : 叒 胃 体 中 下 部 溃 疡 , 叒 病 理 示 中 分 化 腺 癌 ,']
+output_bio_list = ['O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B I I I I I E O O O O O B I I I E O']
+output_attr_list = ['null null null null null null null null null null null null null null null null null null null null null null null null null null null null null null null null null 疾病和诊断 疾病和诊断 疾病和诊断 疾病和诊断 疾病和诊断 疾病和诊断 疾病和诊断 null null null null null 疾病和诊断 疾病和诊断 疾病和诊断 疾病和诊断 疾病和诊断 null']
 
 data_processor_valid = DataProcessor(
-    data_path+"/val/input.seq.char",
-    data_path+"/val/output.seq.bio",
-    data_path+"/val/output.seq.attr",
+    input_char_list,
+    output_bio_list,
+    output_attr_list,
     w2i_char,
     w2i_bio, 
     w2i_attr, 
@@ -124,6 +127,8 @@ with tf.Session(config=tf_config) as sess:
             if (max_batches is not None) and (batches_sample >= max_batches):
                 break
         
+        print(preds_kvpair)
+        print(golds_kvpair)
         p, r, f1 = cal_f1_score(preds_kvpair, golds_kvpair)
 
         logger.info("Valid Samples: {}".format(len(preds_kvpair)))
