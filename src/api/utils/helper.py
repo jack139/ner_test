@@ -74,10 +74,6 @@ def signature_required(view_func):
 
             #print(json_data)
 
-            # 请求写入临时文件，测试使用
-            #with open('/tmp/cardnum/%d.txt'%ret_json['timestamp'], 'w') as f:
-            #    f.write(json.dumps(json_data))
-
             appid = ret_json['appId'] = json_data['appId']
             unixtime = json_data['timestamp']
             signature = json_data.get('signData', '').replace('\r','').replace('\n','') # 去掉回车换行
@@ -135,10 +131,6 @@ def signature_required(view_func):
         sign_str = '%s&key=%s' % (param_str, secret)
 
         #print(sign_str)
-        # 请求写入临时文件，测试使用
-        #with open('/tmp/cardnum/%d.txt'%ret_json['timestamp'], 'a') as f:
-        #    f.write('\n')
-        #    f.write(sign_str)
 
         logger.info("verify_signature: sign_type= "+sign_type) 
         start = time.time()

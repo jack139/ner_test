@@ -1,6 +1,6 @@
 PY = python3.6 -O -m compileall -b -q -f
 SRC = src
-TARGETS = ner
+TARGETS = build
 TEMP = 
 all: clean $(TARGETS)
 
