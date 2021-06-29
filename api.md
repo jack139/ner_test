@@ -135,7 +135,10 @@ SM2加签结果：
 
 | 参数        | 必选 | 类型   | 说明             |
 | ----------- | ---- | ------ | ---------------- |
-| card_number | 是   | string | 检测到的银行卡号 |
+| entities | 是   | string | 识别出实体清单 |
+| + label |  | string | 实体类型 |
+| + value |  | string | 实体文本 |
+| + start_pos |  | int | 在原文中起始位置 |
 | request_id  | 是   | string | 此次请求id       |
 
 返回示例
