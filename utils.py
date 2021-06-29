@@ -139,29 +139,7 @@ class DataProcessor_MTL_BERT(object):
 ####### extract_kvpairs_by_bio #######
 ######################################
 
-def extract_kvpairs_in_bio(bio_seq, word_seq):
-    assert len(bio_seq) == len(word_seq)
-    pairs = set()
-    pre_bio = "O"
-    v = ""
-    for i, bio in enumerate(bio_seq):
-        if (bio == "O"):
-            if v != "": pairs.add((pre_bio[2:], v))
-            v = ""
-        elif (bio[0] == "B"):
-            if v != "": pairs.add((pre_bio[2:], v))
-            v = word_seq[i]
-        elif (bio[0] == "I"):
-            if (pre_bio[0] == "O") or (pre_bio[2:] != bio[2:]):
-                if v != "": pairs.add((pre_bio[2:], v))
-                v = ""
-            else:
-                v += word_seq[i]
-        pre_bio = bio
-    if v != "": pairs.add((pre_bio[2:], v))
-    return pairs
-
-def extract_kvpairs_in_bioes(bio_seq, word_seq, attr_seq):
+def extract_kvpairs_in_bioes(bio_seq, word_seq, attr_seq, with_pos=False):
     assert len(bio_seq) == len(word_seq) == len(attr_seq)
     pairs = set()
     v = ""
@@ -173,7 +151,10 @@ def extract_kvpairs_in_bioes(bio_seq, word_seq, attr_seq):
             v = ""
         elif bio == "S":
             v = word
-            pairs.add((attr, v))
+            if with_pos:
+                pairs.add((attr, v, i-len(v)+1))
+            else:
+                pairs.add((attr, v))
             v = ""
         elif bio == "B":
             v = word
@@ -183,7 +164,10 @@ def extract_kvpairs_in_bioes(bio_seq, word_seq, attr_seq):
         elif bio == "E":
             if v != "":
                 v += word
-                pairs.add((attr, v))
+                if with_pos:
+                    pairs.add((attr, v, i-len(v)+1))
+                else:
+                    pairs.add((attr, v))
             v = ""
     return pairs
 
@@ -208,3 +192,55 @@ def cal_f1_score(preds, golds):
     f1 = 2 * p * r / (p + r) if (p + r) > 0 else 0
     return p, r, f1
 
+
+
+##########################################
+##  prepare data
+##########################################
+
+def prepare_data(original_text):
+    max_len = 0
+    word2tag = []
+    input_char_list = []
+    output_bio_list = []
+    output_attr_list = []
+
+    for w in original_text.replace(' ',''): # 去掉空格
+        word2tag.append([w, 'O', 'null'])
+
+    # 返回的列表
+    length = 0 
+    tmp_char = []
+    tmp_bio = []
+    tmp_attr = []
+
+    for i in word2tag:
+        tmp_char.append(i[0])
+        tmp_bio.append(i[1])
+        tmp_attr.append(i[2])
+
+        length += 1
+
+        # 接近100个字就要换行
+        if  (length>50) and (i[0] in ['；', '，', '。', ',', '、', ';']): 
+            input_char_list.append(' '.join(tmp_char))
+            output_bio_list.append(' '.join(tmp_bio))
+            output_attr_list.append(' '.join(tmp_attr))
+            max_len = max(max_len, length)
+
+            length = 0
+            tmp_char = []
+            tmp_bio = []
+            tmp_attr = []
+
+    # 一条结束后，如果还有剩余字符，都进行换行
+    if length>0:
+        input_char_list.append(' '.join(tmp_char))
+        output_bio_list.append(' '.join(tmp_bio))
+        output_attr_list.append(' '.join(tmp_attr))
+        max_len = max(max_len, length)
+
+    #for i in range(len(word2tag)):
+    #    print('%s\t%s\t%s'%(word2tag[i][0],word2tag[i][1],word2tag[i][2]))
+
+    return input_char_list, output_bio_list, output_attr_list, max_len

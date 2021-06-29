@@ -86,15 +86,6 @@ def __preprocess_tagged_data(samples_list, tagged_data_filepath, delimiter="\n")
         tmp_attr = []
 
         for i in word2tag:
-            #if length>0:
-            #    f_in_char.write(' ')
-            #    f_out_bio.write(' ')
-            #    f_out_attr.write(' ')
-
-            #f_in_char.write(i[0])
-            #f_out_bio.write(i[1])
-            #f_out_attr.write(i[2])
-
             tmp_char.append(i[0])
             tmp_bio.append(i[1])
             tmp_attr.append(i[2])
