@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from bert import modeling as bert_modeling
+from .bert import modeling as bert_modeling
 
 class MyModel(object):
     

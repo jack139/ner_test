@@ -3,22 +3,22 @@ import tensorflow as tf
 import numpy as np
 import os
 
-from model_multitask_bert import MyModel
-from bert import modeling as bert_modeling
-from utils import DataProcessor_MTL_BERT as DataProcessor
-from utils import load_vocabulary
-from utils import extract_kvpairs_in_bioes
-from utils import cal_f1_score
+from ner.model_multitask_bert import MyModel
+from ner.bert import modeling as bert_modeling
+from ner.utils import DataProcessor_MTL_BERT as DataProcessor
+from ner.utils import load_vocabulary
+from ner.utils import extract_kvpairs_in_bioes
+from ner.utils import cal_f1_score
 
-data_path = "./data/data2"
+data_path = "../data/data2"
 
-bert_vocab_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/vocab.txt"
-bert_config_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/bert_config.json"
-bert_ckpt_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/bert_model.ckpt"
-#bert_ckpt_path = "ckpt/model.ckpt.batch4700_0.7603"
+bert_vocab_path = "../../nlp_model/chinese_bert_L-12_H-768_A-12/vocab.txt"
+bert_config_path = "../../nlp_model/chinese_bert_L-12_H-768_A-12/bert_config.json"
+bert_ckpt_path = "../../nlp_model/chinese_bert_L-12_H-768_A-12/bert_model.ckpt"
+#bert_ckpt_path = "../ckpt/model.ckpt.batch4700_0.7603"
 
 # set logging
-log_file_path = "./ckpt/run.log"
+log_file_path = "../ckpt/run.log"
 if os.path.exists(log_file_path): os.remove(log_file_path)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

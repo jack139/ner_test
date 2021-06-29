@@ -205,7 +205,7 @@ def prepare_data(original_text):
     output_bio_list = []
     output_attr_list = []
 
-    for w in original_text.replace(' ',''): # 去掉空格
+    for w in original_text: # 去掉空白换行等
         word2tag.append([w, 'O', 'null'])
 
     # 返回的列表

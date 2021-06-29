@@ -15,8 +15,8 @@ JSON_END_POS_KEY = "end_pos"
 JSON_LABEL_KEY = "label_type"
 JSON_OVERLAP_KEY = "overlap"
 
-ORI_DATA_DIR = "../data/test/original_data/"
-PROC_DATA_DIR = "../data/test/processed_data/"
+ORI_DATA_DIR = "../../data/test/original_data/"
+PROC_DATA_DIR = "../../data/test/processed_data/"
 
 vocab_attr = set(['null'])
 

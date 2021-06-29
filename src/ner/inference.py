@@ -4,20 +4,21 @@ import numpy as np
 import os
 from datetime import datetime
 
-from model_multitask_bert import MyModel
-from bert import modeling as bert_modeling
-from utils import DataProcessor_MTL_BERT as DataProcessor
-from utils import load_vocabulary
-from utils import extract_kvpairs_in_bioes
-from utils import cal_f1_score
-from utils import prepare_data
+from .model_multitask_bert import MyModel
+from .bert import modeling as bert_modeling
+from .utils import DataProcessor_MTL_BERT as DataProcessor
+from .utils import load_vocabulary
+from .utils import extract_kvpairs_in_bioes
+from .utils import cal_f1_score
+from .utils import prepare_data
+from config.settings import NER_CHECKPOINT
 
-data_path = "ckpt"
+data_path = NER_CHECKPOINT
 
 # base model: chinese_bert_L-12_H-768_A-12
-bert_vocab_path = "ckpt/vocab.txt"
-bert_config_path = "ckpt/bert_config.json"
-bert_ckpt_path = "ckpt/model.ckpt.batch1500_0.8141"
+bert_vocab_path = os.path.join(data_path, "vocab.txt")
+bert_config_path = os.path.join(data_path, "bert_config.json")
+bert_ckpt_path = os.path.join(data_path, "model.ckpt.batch1500_0.8141")
 
 # set logging
 logger = logging.getLogger()
@@ -30,9 +31,8 @@ logger.addHandler(chlr)
 logger.info("loading vocab...")
 
 w2i_char, i2w_char = load_vocabulary(bert_vocab_path)
-w2i_bio, i2w_bio = load_vocabulary(data_path+"/vocab_bio.txt")
-w2i_attr, i2w_attr = load_vocabulary(data_path+"/vocab_attr.txt")
-
+w2i_bio, i2w_bio = load_vocabulary(os.path.join(data_path, "vocab_bio.txt"))
+w2i_attr, i2w_attr = load_vocabulary(os.path.join(data_path, "vocab_attr.txt"))
 
 
 logger.info("building model...")
@@ -66,13 +66,14 @@ tf_config.gpu_options.allow_growth = True
 
 # 全局session
 sess = tf.Session(config=tf_config)
-
+sess.run(tf.global_variables_initializer())
 
 # 模型推理
 def inference(original_text):
     # 准备数据
     logger.info("prepare data...")
 
+    # 准备输入数据格式
     input_char_list, output_bio_list, output_attr_list, max_len = prepare_data(original_text)
 
     data_processor_valid = DataProcessor(
@@ -86,8 +87,6 @@ def inference(original_text):
     )
 
     logger.info("start inference...")
-
-    sess.run(tf.global_variables_initializer())
         
     def valid(data_processor, max_batches=None, batch_size=1024):
         preds_kvpair = []
@@ -158,6 +157,9 @@ def inference(original_text):
                 'start_pos' : j[2]+pos_offset,
             })
         pos_offset += len(input_char_list[i].replace(' ',''))
+
+    # 按起始位置排序
+    entities = sorted(entities, key=lambda x: x['start_pos'])
 
     return entities
 

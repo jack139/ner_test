@@ -8,8 +8,8 @@ import os
 import numpy as np
 
 
-ORI_DATA_DIR = "../data/test/1/"
-TARGET_DATA_DIR = "../data/test/2/"
+ORI_DATA_DIR = "../../data/test/1/"
+TARGET_DATA_DIR = "../../data/test/2/"
 
 
 def convert_data(ori_data_dir, target_data_dir):

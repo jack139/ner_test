@@ -4,19 +4,19 @@ import numpy as np
 import os
 from datetime import datetime
 
-from model_multitask_bert import MyModel
-from bert import modeling as bert_modeling
-from utils import DataProcessor_MTL_BERT as DataProcessor
-from utils import load_vocabulary
-from utils import extract_kvpairs_in_bioes
-from utils import cal_f1_score
+from ner.model_multitask_bert import MyModel
+from ner.bert import modeling as bert_modeling
+from ner.utils import DataProcessor_MTL_BERT as DataProcessor
+from ner.utils import load_vocabulary
+from ner.utils import extract_kvpairs_in_bioes
+from ner.utils import cal_f1_score
 
-data_path = "ckpt"
+data_path = "../ckpt"
 
 # base model: chinese_bert_L-12_H-768_A-12
-bert_vocab_path = "ckpt/vocab.txt"
-bert_config_path = "ckpt/bert_config.json"
-bert_ckpt_path = "ckpt/model.ckpt.batch1500_0.8141"
+bert_vocab_path = "../ckpt/vocab.txt"
+bert_config_path = "../ckpt/bert_config.json"
+bert_ckpt_path = "../ckpt/model.ckpt.batch1500_0.8141"
 
 # set logging
 logger = logging.getLogger()
