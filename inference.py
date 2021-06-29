@@ -2,6 +2,7 @@ import logging
 import tensorflow as tf
 import numpy as np
 import os
+from datetime import datetime
 
 from model_multitask_bert import MyModel
 from bert import modeling as bert_modeling
@@ -10,10 +11,11 @@ from utils import load_vocabulary
 from utils import extract_kvpairs_in_bioes
 from utils import cal_f1_score
 
-data_path = "./data/data2"
+data_path = "ckpt"
 
-bert_vocab_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/vocab.txt"
-bert_config_path = "../nlp_model/chinese_bert_L-12_H-768_A-12/bert_config.json"
+# base model: chinese_bert_L-12_H-768_A-12
+bert_vocab_path = "ckpt/vocab.txt"
+bert_config_path = "ckpt/bert_config.json"
 bert_ckpt_path = "ckpt/model.ckpt.batch1500_0.8141"
 
 # set logging
@@ -98,7 +100,9 @@ with tf.Session(config=tf_config) as sess:
                 model.inputs_segment: inputs_segment_batch
             }
             
+            start_time = datetime.now()
             preds_seq_bio_batch, preds_seq_attr_batch = sess.run(model.outputs, feed_dict)
+            print('[Time taken: {!s}]'.format(datetime.now() - start_time))
             
             for pred_seq_bio, gold_seq_bio, pred_seq_attr, gold_seq_attr, input_seq, mask in zip(preds_seq_bio_batch,
                                                                                                  outputs_seq_bio_batch,
