@@ -3,7 +3,7 @@
 ############# 算法相关设置
 
 # ner 预训练权重的路径
-NER_CHECKPOINT = '/home/gt/Codes/nlp/ner_test/ckpt'
+NER_CHECKPOINT = '/home/tao/Codes/nlp/ner_test/ckpt'
 
 ############  app server 相关设置
 

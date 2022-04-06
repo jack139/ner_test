@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from ner.inference import inference
+#from ner.inference import inference
+from pack.inference import inference
 from api import logger
 
 logger = logger.get_logger(__name__)
